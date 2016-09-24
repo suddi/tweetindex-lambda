@@ -4,10 +4,10 @@ RESTful API to retrieve stock tweets about Fortune 100 stocks from Twitter's str
 
 ## Requirements
 
-Python 2.7 (At the time of writing this, AWS Lambda only supports Python 2.7).
-Pip (~8.1.1)
-Virtualenv (~15.0.0)
-Virtualenvwrapper (~4.7.1)
+* Python 2.7 (At the time of writing this, AWS Lambda only supports Python 2.7).
+* Pip (~8.1.1)
+* Virtualenv (~15.0.0)
+* Virtualenvwrapper (~4.7.1)
 
 ## Setup
 
