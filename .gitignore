@@ -1,0 +1,7 @@
+# Directories
+coverage
+temp
+dist
+
+# Files
+*.pyc
