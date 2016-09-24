@@ -30,9 +30,9 @@ def respond(status_code, response):
 def handler(event, context):
     method = event['httpMethod']
 
-    if method == 'GET':
-        payload = event['queryStringParameters']
-    elif method == 'POST':
+    # if method == 'GET':
+        # payload = event['queryStringParameters']
+    if method == 'POST':
         body = json.loads(event['body'])
         createItem(body)
         return respond('200', {
