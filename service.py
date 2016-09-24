@@ -5,6 +5,9 @@ from datetime import datetime
 
 dynamo = boto3.resource('dynamodb').Table('tweets')
 
+# ------------------------------------------------------------------------------
+# Timestamp setting functions
+# ------------------------------------------------------------------------------
 def getCurrentUTCTime():
     return datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
 
@@ -14,10 +17,16 @@ def setTimestamp(document):
     document['updated_at'] = timestamp
     return document
 
+# ------------------------------------------------------------------------------
+# DynamoDB handling functions
+# ------------------------------------------------------------------------------
 def createItem(document):
     document = setTimestamp(document)
     return dynamo.put_item(Item=document)
 
+# ------------------------------------------------------------------------------
+# Request handling functions
+# ------------------------------------------------------------------------------
 def respond(status_code, response):
     return {
         'statusCode': status_code,
@@ -27,20 +36,28 @@ def respond(status_code, response):
         'body': response
     }
 
+def handlePOSTRequest(body):
+    createItem(body)
+    return respond('200', {
+        'message': 'Success',
+        'data': body
+    })
+
+def handleUnknownRequest():
+    return respond('400', {
+        'message': 'Unauthorized',
+        'data': {}
+    })
+
+# ------------------------------------------------------------------------------
+# Lambda event handler
+# ------------------------------------------------------------------------------
 def handler(event, context):
     method = event['httpMethod']
 
     # if method == 'GET':
         # payload = event['queryStringParameters']
     if method == 'POST':
-        body = json.loads(event['body'])
-        createItem(body)
-        return respond('200', {
-            'message': 'Success',
-            'data': body
-        })
+        return handlePOSTRequest(json.loads(event['body']))
     else:
-        return respond('400', {
-            'message': 'Unauthorized',
-            'data': {}
-        })
+        return handleUnknownRequest()
