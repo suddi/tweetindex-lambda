@@ -16,15 +16,17 @@ def get_current_time():
 
 def set_timestamp(document):
     timestamp = get_current_time()
-    document['created_at'] = timestamp
-    document['updated_at'] = timestamp
+    if not 'created_at' in document:
+        document['created_at'] = timestamp
+    if not 'updated_at' in document:
+        document['updated_at'] = timestamp
     return document
 
 # ------------------------------------------------------------------------------
 # DynamoDB handling functions
 # ------------------------------------------------------------------------------
 def create_item(document):
-    # document = set_timestamp(document)
+    document = set_timestamp(document)
     if document['type'] == 'tweet':
         return tweet.put_item(Item=document)
     else:
