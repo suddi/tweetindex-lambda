@@ -1,18 +1,21 @@
+# -*- coding: utf-8 -*-
+
 import boto3
 import json
 
 from datetime import datetime
 
-dynamo = boto3.resource('dynamodb').Table('tweets')
+tweet = boto3.resource('dynamodb').Table('tweets')
+error = boto3.resource('dynamodb').Table('errors')
 
 # ------------------------------------------------------------------------------
 # Timestamp setting functions
 # ------------------------------------------------------------------------------
-def getCurrentUTCTime():
+def get_current_time():
     return datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
 
-def setTimestamp(document):
-    timestamp = getCurrentUTCTime()
+def set_timestamp(document):
+    timestamp = get_current_time()
     document['created_at'] = timestamp
     document['updated_at'] = timestamp
     return document
@@ -20,9 +23,12 @@ def setTimestamp(document):
 # ------------------------------------------------------------------------------
 # DynamoDB handling functions
 # ------------------------------------------------------------------------------
-def createItem(document):
-    document = setTimestamp(document)
-    return dynamo.put_item(Item=document)
+def create_item(document):
+    document = set_timestamp(document)
+    if document['type'] == 'tweet':
+        return tweet.put_item(Item=document)
+    else:
+        return error.put_item(Item=document)
 
 # ------------------------------------------------------------------------------
 # Request handling functions
@@ -36,14 +42,14 @@ def respond(status_code, response):
         'body': response
     }
 
-def handlePOSTRequest(body):
-    createItem(body)
+def handle_post_request(body):
+    create_item(body)
     return respond('200', {
-        'message': 'Success',
+        'message': 'OK',
         'data': body
     })
 
-def handleUnknownRequest():
+def handle_unknown_request():
     return respond('400', {
         'message': 'Unauthorized',
         'data': {}
@@ -58,6 +64,6 @@ def handler(event, context):
     # if method == 'GET':
         # payload = event['queryStringParameters']
     if method == 'POST':
-        return handlePOSTRequest(json.loads(event['body']))
+        return handle_post_request(json.loads(event['body']))
     else:
-        return handleUnknownRequest()
+        return handle_unknown_request()
