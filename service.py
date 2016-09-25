@@ -24,7 +24,7 @@ def set_timestamp(document):
 # DynamoDB handling functions
 # ------------------------------------------------------------------------------
 def create_item(document):
-    document = set_timestamp(document)
+    # document = set_timestamp(document)
     if document['type'] == 'tweet':
         return tweet.put_item(Item=document)
     else:
